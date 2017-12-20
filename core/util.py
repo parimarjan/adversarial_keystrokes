@@ -1,7 +1,6 @@
 import os
 import pickle
 import numpy as np
-from PIL import Image
 import errno
 
 def do_pickle(pickle_bool, pickle_name, num_args, func, *args, **kwargs):
@@ -28,25 +27,6 @@ def do_pickle(pickle_bool, pickle_name, num_args, func, *args, **kwargs):
         handle.close()
 
     return rets
-
-def combine_imgs(imgs, direction):
-    '''
-    '''
-    # pick the image which is the smallest, and resize the others to match it (can be arbitrary image shape here)
-
-    min_shape = sorted([(np.sum(i.size), i.size) for i in imgs])[0][1]
-    if 'hor' in direction:
-        min_shape = (30,30)
-
-    if 'hor' in direction:
-        imgs_comb = np.hstack( (np.asarray( i.resize(min_shape, Image.ANTIALIAS) ) for i in imgs ) )
-        imgs_comb = Image.fromarray(imgs_comb)
-    else: 
-        imgs_comb = np.vstack( (np.asarray( i.resize(min_shape, Image.ANTIALIAS) ) for i in imgs ) )
-        imgs_comb = Image.fromarray(imgs_comb)
-
-    return imgs_comb
-
 
 def mix_samples(train_genuine, train_impostors):
     """

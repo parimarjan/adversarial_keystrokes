@@ -23,9 +23,6 @@ if torch_installed:
     import torch.optim as optim
     from torch.autograd import Variable
 
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-
 # This is for swipes data
 EXPERT_LEVEL_ATTACK = False
 
@@ -523,11 +520,6 @@ class AdversarialAE():
                 print('mean of X_mb was: ')
                 print(np.mean(X_mb))
 
-                # fig = plot(samples)
-                # plt.savefig('out/{}.png'.format(str(i).zfill(3)), bbox_inches='tight')
-                # i += 1
-                # plt.close(fig)
-
         # save samples for future use.
         samples = sess.run(X_samples, feed_dict={z: np.random.randn(16, self.z_dim)})
         # samples = sess.run(G_sample, feed_dict={z: sample_z(500, self.z_dim)})
@@ -788,10 +780,7 @@ class WGANAdversary():
 
                     # WTF is being plotted here?
                     # fig = plot(samples)
-                    # plt.savefig('out/{}.png'
-                                # .format(str(i).zfill(3)), bbox_inches='tight')
                     i += 1
-                    # plt.close(fig)
         
         samples = sess.run(G_sample, feed_dict={z: sample_z(500, self.z_dim)})
 

@@ -64,7 +64,7 @@ class Loader():
         # files and stuff 
         self.root_dir = os.path.dirname(os.path.realpath(__file__))
         self.root_dir = os.path.join(self.root_dir, './..')
-        self.data_dir = os.path.join(self.root_dir, 'data')
+        self.data_dir = os.path.join(self.root_dir, 'datasets')
         self.dataset = os.path.join(self.data_dir, exp.params.dataset)
         self.params = exp.params
 

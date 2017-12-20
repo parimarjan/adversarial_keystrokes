@@ -18,114 +18,35 @@ from anomaly import *
 from pohmm import Pohmm
 from collections import defaultdict
 from util import *
-import pylab as Plot
 
-from fitter import Fitter
 from scipy.stats import norm, gamma, beta
 from sklearn.cluster import KMeans
 # from gap import gap
 from collections import defaultdict
-from dbn_user import DBN_User
 
 from sklearn.metrics import silhouette_samples, silhouette_score
 from sklearn.manifold import TSNE
 from sklearn.model_selection import train_test_split
-import seaborn as sns
+
+try:
+    import seaborn as sns
+except ImportError:
+    pass
 
 def plot_distribution(samples, file_name):
     print('num of samples are ', len(samples)) 
     main_fig = plt.figure()
     ax1 = main_fig.add_subplot(131)
     fig = sns.distplot(samples, kde=False, ax=ax1)
-    # fig.get_figure().x_lim=((0,0.3))
 
     ax1.set_xlim((min(samples)-0.1,max(samples)+0.1))
     # sns.plt.show()
-    # time.sleep(2)
-    # print('sleep done')
     fig.get_figure().savefig(file_name)
     print('saved file ', file_name)
-    # main_fig.savefig('ax' + file_name)
     sns.plt.close() 
-
-    # matplotlib is fucked up
-    # import matplotlib.pyplot as plt
-    # mu, sigma = 100, 15
-    # x = mu + sigma * np.random.randn(10000)
-
-    # # the histogram of the data
-    # n, bins, patches = plt.hist(samples)
-    # plt.xlabel('milliseconds')
-    # plt.ylabel('Num samples')
-    # plt.title(file_name)
-    # # plt.text(60, .025, r'$\mu=100,\ \sigma=15$')
-    # plt.axis([0, 0.3, 100, 10000])
-    # # plt.grid(True)
-    # plt.show()
-    # time.sleep(2)
-    # print('sleep done!')
-    # plt.close()
-
-# FIXME: Get rid of this.
-def get_train_impostors_deng(data, user, test_impostor, num_per_impostor=4):
-    """
-    Selecting 'background' training samples as described in Deng and Zhong
-    paper for dbn's and gaussian mixture models. 
-
-    First four samples from all users, except test_impostor, and user, are
-    selected to train the model. 
-    
-    user = current user. string.
-    test_impostor = impostor that this user will be tested against. type:
-    string.
-    
-    @ret: set of 196 feature vectors from 49 users. (4 * 49).
-    """
-    ret_list = []
-    for cur_user in data:
-        if(cur_user == user or cur_user == test_impostor):
-            continue 
-        cur_features = data[cur_user]
-        
-        # Select first 4 users.
-        for i in range(num_per_impostor):
-            ret_list.append(cur_features[i])
-    
-    return ret_list
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
         return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
-
-def tsne_wrapper(features):
-    tsne = TSNE(verbose=True, init='pca', learning_rate=500)
-    return tsne.fit_transform(features) 
-
-def run_tsne(all_feature_vectors, labels):
-    '''
-    '''
-    # pickle_name = 'tsne.pickle'
-    # Y = do_pickle(False, pickle_name, 1, tsne_wrapper, all_feature_vectors)
-    # tsne_color_plot(Y)
-    # return Y
- 
-def tsne_color_plot(Y, labels):
-    '''
-    FIXME: Cycles through limited colors still...
-
-    all_feature vectors are actually not required...
-    '''
-    assert len(Y) == len(labels), 'all must be equal'
-
-    hashed_names = hashlib.sha1(str(Y)).hexdigest()
-    file_name = 'tsne_plt_color' + hashed_names[0:5] + '.png'
-
-    print('tsne name is ', file_name)
-    
-    # labels = get_tsne_names(imgs)
-    # assert len(labels) == len(imgs), 'simple assert' 
-    # add labels...
-    Plot.scatter(Y[:,0], Y[:,1], 10, labels);
-    Plot.savefig(file_name, dpi=1200)
  
 class Experiment():
     '''
@@ -217,34 +138,6 @@ class Experiment():
             print('let us try to generate samples from this distribution: ')
             gen_samples = np.random.normal(loc=loc, scale=scale, size=10) 
             print(gen_samples) 
-        '''
-        This crap with fitter was quite unsuccessful anyway.
-        TODO: Try to fit a gaussian - get its parameters and then generate
-        attack vectors from those.
-        '''
-        # hold_data = self._get_data(0)
-        # # print(len(hold_data))
-        # # test_data = random.sample(hold_data, 1000)
-        # test_data = hold_data
-
-        # print('mean = ', np.mean(np.array(test_data)))
-        # print('std = ', np.std(np.array(test_data)))
-
-        # n = norm.fit(test_data)
-        # print('normal = ', n)
-        # g = gamma.fit(test_data)
-        # print('gamma = ', g)
-
-        # test = np.random.normal(n[0], n[1], 10)
-        # print(test)
-
-        # b = beta.fit(test_data)
-        # print('beta = ', b)
-    
-        # f = Fitter(test_data, verbose=0)
-        # f.distributions = f.distributions[0:10] + ['gamma']
-        # f.fit()
-        # f.summary()
 
     def cluster_analysis(self):
         # from gap import gap 
@@ -266,18 +159,6 @@ class Experiment():
                     removed += 1
         print "accepted: ", accepted
         print "removed: ", removed
-
-        # X, labels = self._get_digraph_data()
-        # assert len(X[0]) == 10, 'only digraph data'
-        # assert len(X) >= 20000, 'only digraph data'
-        if tsne:
-            tsneX, tsneY = self._get_digraph_data(num_users=10)
-            print('tsne X len is ', len(tsneX))
-            tsneX, _, tsneY, _ = train_test_split(tsneX, tsneY,
-                    train_size=0.5)
-            print(len(tsneX))
-            Y = tsne_wrapper(tsneX)
-            tsne_color_plot(Y, tsneY)
 
         if gap_stat:
             X = np.array(X) 
@@ -795,9 +676,6 @@ class Experiment():
         for user in users:
             yi = user.y
             # Each centroid can essentially be viewed as a feature vector.
-
-            # Alternative will be to create a new kmeans attack for each impostor
-            # (as we did for dbns.....)
             centroids = attacker.kmeans_attack(yi,clusters=self.params.kmeans_cluster_size,
                                         num_impostors=self.params.kmeans_impostors,
                                         num_impostor_samples=self.params.kmeans_impostor_samples)
@@ -1104,25 +982,7 @@ class Experiment():
                                                 thresh=1e-2))
             if self.params.gaussian_mixture:
                 user.train(lambda: GM(), name='Gaussian Mixture')
-
-            if self.params.dbn: 
-                assert len(user.classifiers) == 0, 'cant run \
-                        dbn with other classifiers'
-                if not self.params.deng:
-                    user = DBN_User(yi, train_impostors, normalize=True)
-                    impostor = 'mixed'
-                    train_impostors = self._get_impostors(data,
-                            yi,num=len(train_samples)/2)
-                    user.train(impostor, train_impostors)
-
-                    # Last arg doesn't matter here.
-                    test_samples = get_train_impostors_deng(data, yi, impostor)
-                    user.set_thresholds(impostor, test_samples)
-                    user.get_user_eer()
-                     
-                else:
-                    assert False, 'deng not implemented yet'
-
+            
             users.append(user)             
             # This doesn't seem particularly useful. Maybe get stats later, but
             # people did generally well...can just use EER stats instead.
@@ -1130,7 +990,6 @@ class Experiment():
             if self.params.complete_check:
                 self._complete_check(data, yi, user)
         
-        # FIXME: Important: figure out why dbn is failing this.
         data_hash2 = hashlib.md5(pickle.dumps(data)).hexdigest()
         assert data_hash1 == data_hash2, 'data hashes diff!'
         end_time = time.time()

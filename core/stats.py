@@ -1,7 +1,6 @@
 import hashlib
 import csv
 import os
-
 from collections import OrderedDict
 
 class Stats():
@@ -40,14 +39,8 @@ class Stats():
         '''
         Print all the params - to stdout, or a file, or whatever.
         '''
-        # TODO:
-        # for k, v in self.params.__dict__.iteritems():
-            # if v:
-                # print('{} : {}'.format(k,v))
-        
-        print('digraph attack: {}, dataset: {}, prob_then_kmeans: {}, \
-        password_keys: {}'.format(self.params.digraph_attack,
-            self.params.dataset, self.params.prob_then_kmeans,
+        print('''digraph attack: {}, dataset: {}, prob_then_kmeans: {}, password_keys: {}'''.format(
+            self.params.digraph_attack, self.params.dataset, self.params.prob_then_kmeans, 
             self.params.password_keys))
     
     def _get_monaco_norm_filename(self):
@@ -82,10 +75,10 @@ class Stats():
             reports[cl_name] = self.cracker[cl_name].report()
 
         rows = [] 
+        results = OrderedDict()
         for cl_name in reports:
             # one row for each report!
             report = reports[cl_name]
-            results = OrderedDict()
             # FIXME: 
             if cl_name == 'ensemble':
                 cl_name += str(self.params.classifiers_list)
@@ -104,26 +97,7 @@ class Stats():
             
             if verbose:
                 print 'results are ', results
-                print '*********************************************'
-            
-            # TODO: Write header            
-            # with open(self.cracker_file_name, 'a') as csvfile:
-                # wr = csv.writer(csvfile, delimiter=' ',
-                                        # quotechar='|', quoting=csv.QUOTE_MINIMAL)
-
-                # for alg, percentage_cracked in results.iteritems():
-                    # for i, percentage in enumerate(percentage_cracked):
-                        # print('alg: {}, i : {}, cracked: {}'.format(alg, i, percentage))
-                        # row = []
-                        # row.append(alg)
-                        # row.append(str(i) + ': ' + str(percentage))
-                        # wr.writerow(row)
-
-            # with open(self.cracker_file_name, 'a') as f:  
-                # w = csv.DictWriter(f, results.keys())
-                # w.writeheader()
-                # w.writerow(results)
-        
+                print '*********************************************' 
         return results
 
 

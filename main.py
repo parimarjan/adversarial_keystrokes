@@ -2,7 +2,7 @@ from core.experiment import *
 
 datasets = ['mturk_letmein.csv', 'mturk_password.csv', 'mturk_123456789.csv',
             'mturk_mustang.csv', 'mturk_abc123.csv']
-COMBINE_MTURK = True
+COMBINE_MTURK = False
 def main():
 
     if COMBINE_MTURK:
