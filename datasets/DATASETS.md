@@ -1,38 +1,38 @@
-
 # Datasets
-    - Describe dataset formats
-    - + link to cmu database format as well (+ whatever copyright notice is needed)
 
 ## Contents
   * [Downloading Datasets](#download)
-      - [CMU DSN Dataset](#cmu_dataset)
-      - [MTurk Dataset](#mturk_dataset)
-      - [Android Touch Screen Swipes Dataset](#android)
-  * [Download Raw Data](#raw data)
-  * [Description of data](#description)
+  * [Description](#description)
+    - [CMU Dataset](#cmu-dataset)
+    - [MTurk Datasets](#mturk-datasets)
+    - [Android Swipes Dataset](#android-swipes-dataset)
+    - [Indiscriminate Adversarial Samples](#indiscriminate-adversarial-samples)
   * [Data Collection Details](#details)
 
 
 ## Download
+    To download all the datasets, just run the shell script:
+    ```bash
+    $ sh download.sh
+    ```
+    Or you can just download each of the datasets individually based on the script.
 
-    test!!
-    test!!
-    test!!
-
-## Raw Data
-
-    test!!
-    test!!
-    test!!
 
 ## Description
+    All the datasets follow the format used by the [Killourhy and Maxion CMU dataset](https://www.cs.cmu.edu/~keystroke/)
 
-    test!!
-    test!!
-    test!!
+#### CMU Dataset
+    This is the standard benchmark dataset used for a long time in many keystroke dynamics research
+    papers. It has been described in detail [here](google.com).
 
-## Details
+#### MTurk Datasets
+    This dataset was collected by 
+    
+    <!--Add description about the download process etc.-->
 
-    test!!
-    test!!
-    test!!
+#### Android Swipes Dataset
+
+
+#### Indiscriminate Adversarial Samples
+    TODO: add download details
+
