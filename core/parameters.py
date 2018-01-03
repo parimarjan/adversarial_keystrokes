@@ -189,7 +189,9 @@ class Parameters():
             self.mouse = True
         else:
             assert False, 'unrecognized dataset'
-
+        
+        # These are used for the digraph attack. Each element represents a key for which we need
+        # timing samples.
         if self.dataset == 'mturk_mustang.csv':
             self.password_keys = ['m', 'mu', 'u', 'us', 's', 'st', 't', 'ta', 'a', 'an',
                             'n', 'ng', 'g']

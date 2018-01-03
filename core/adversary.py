@@ -247,9 +247,6 @@ class ProbabilisticAdversary():
     def add_data(self, data):
         '''
         @data: dictionary / list or whatever format of the data.
-        @dataset_type: 'cmu_style' will mean the data format we use right now
-        for keystrokes, but later can have parsers for free text or other
-        sources.
 
             gen_case: data['a'] = samples.
                       data['ac'] = samples

@@ -145,15 +145,6 @@ class Manhattan(object):
 
         return - np.abs(X - self.mean).sum(axis=1)
 
-    def choose_threshold(self, scores_genuine, scores_impostor):
-        """
-        Each classifier should have its own way of choosing the threshold.
-        Might want to experiment more with this when we start conducting
-        adversarial attacks.
-        """
-        # This seems to perform exceedingly well.
-        return min(scores_genuine)
-
 class OneClassSVM(object):
     """
     One-class support vector machine
@@ -175,12 +166,6 @@ class OneClassSVM(object):
     def score(self, X):
         score = self.clf.decision_function(X[np.newaxis, :]).squeeze()
         return score
-
-    def choose_threshold(self, scores_genuine, scores_impostor):
-        """
-        """
-        # This seems to perform exceedingly well.
-        return np.mean(scores_genuine)
 
 class ContractiveAutoencoder(object):
     """

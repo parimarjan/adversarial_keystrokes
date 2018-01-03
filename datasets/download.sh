@@ -12,3 +12,4 @@ wget -O mturk_mustang.csv parimarjan.github.io/keystrokes_datasets/mturk_mustang
 wget http://www.ms.sapientia.ro/~manyi/personality/PersonalitySwipes_full.arff
 
 # convert to .csv format
+python arff_to_csv.py
