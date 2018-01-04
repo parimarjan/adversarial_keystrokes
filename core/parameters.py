@@ -33,7 +33,7 @@ class Parameters():
 
         parser.add_argument('-v', '--verbose', help='increase output \
                             verbosity',default=False,type='Bool')
-        
+
         parser.add_argument('--induced_eer', help='',default=False,type='Bool')
         parser.add_argument('--vgan', help='',default=False,type='Bool')
         parser.add_argument('--aegan', help='',default=False,type='Bool')
@@ -80,7 +80,7 @@ class Parameters():
                             default=False,type='Bool')
         parser.add_argument('--knc', help='use KNN classifier',
                             default=False,type='Bool')
-        parser.add_argument('--knc_n', help='num of trees for rf classifier',
+        parser.add_argument('--knc_neighbors', help='num of neighbors for knc classifier',
                             default=2, type=int)
         parser.add_argument('--nearest_neighbors', help='use nearest neighbor classifier',
                             default=False,type='Bool')
@@ -95,7 +95,7 @@ class Parameters():
 
         parser.add_argument('--dbn',help='use dbn', default=False, type='Bool')
         parser.add_argument('--deng', help='use dbn', default=False, type='Bool')
-        
+
 
         #TODO: Add support for --all flag.
         parser.add_argument('--quick_test', '--qt', help='run classifiers on only \
@@ -123,7 +123,7 @@ class Parameters():
                             area feature', default=False,type='Bool')
         parser.add_argument('--swipes_test_size', help='percentage of users \
                 for test set', default=0.5,type=float)
-         
+
         parser.add_argument('--eer_threshold', help='use eer threshold or not',
                              default=True,type='Bool')
 
@@ -159,7 +159,7 @@ class Parameters():
 
         # parser.add_argument('--impostor_samples', help='', default=200)
 
-        args = parser.parse_args()        
+        args = parser.parse_args()
         return args
 
     def _update_params(self, args):
@@ -171,15 +171,15 @@ class Parameters():
         Then can return args instead of doing this crap - and that will
         essentially become self.params.
         '''
+        # update the class items based on args
+        for k, v in vars(args).iteritems():
+            setattr(self, k, v) 
 
-        self.pickle = args.pickle
-        self.dataset = args.dataset
-
+        # update some other class items.
         self.android = False
         self.keystrokes = False
         self.mouse = False
-        
-        #TODO: This can be relegated to an update args function.
+
         if 'android' in self.dataset:
             self.android = True
             self.feature_norm = False
@@ -189,33 +189,33 @@ class Parameters():
             self.mouse = True
         else:
             assert False, 'unrecognized dataset'
-        
+
         # These are used for the digraph attack. Each element represents a key for which we need
         # timing samples.
         if self.dataset == 'mturk_mustang.csv':
             self.password_keys = ['m', 'mu', 'u', 'us', 's', 'st', 't', 'ta', 'a', 'an',
                             'n', 'ng', 'g']
-            self.digraph_attack_file = 'data/prob_attack_data.json'
+            self.digraph_attack_file = 'datasets/attack_mustang.json'
         elif self.dataset == 'mturk_password.csv':
             self.password_keys = ['p', 'pa', 'a', 'as', 's' , 'ss', 's', 'sw', 'w', 'wo', 'o', 'or', 'r', 'rd', 'd']
-            self.digraph_attack_file = 'data/attack_password2.json' 
+            self.digraph_attack_file = 'datasets/attack_password.json'
         elif self.dataset == 'mturk_letmein.csv':
             self.password_keys = ['l', 'le', 'e', 'et', 't', 'tm', 'm', 'me',
             'e', 'ei', 'i', 'in', 'n']
-            self.digraph_attack_file = 'data/attack_letmein.json' 
+            self.digraph_attack_file = 'datasets/attack_letmein.json'
         elif self.dataset == 'mturk_abc123.csv':
             self.password_keys = ['a', 'ab', 'b', 'bc', 'c', 'c1', '1', '12',
             '2', '23', '3']
-            self.digraph_attack_file = 'data/attack_abc123.json' 
+            self.digraph_attack_file = 'datasets/attack_abc123.json'
         elif self.dataset == 'mturk_123456789.csv':
             self.password_keys = ['1', '12', '2', '23', '3', '34', '4', '45',
             '5', '56', '6', '67', '7', '78', '8', '89', '9']
-            self.digraph_attack_file = 'data/attack_123456789.json' 
+            self.digraph_attack_file = 'datasets/attack_123456789.json'
         elif self.dataset == 'cmu.csv':
             self.password_keys = ['dot', 'dott', 't', 'ti', 'i', 'ie', 'e',
             'e5', '5', '5Shift', 'Shift', 'Shiftr', 'r', 'ro', 'o', 'oa', 'a',
             'an', 'n', 'nl', 'l']
-            self.digraph_attack_file = 'data/attack_cmu.json' 
+            self.digraph_attack_file = 'datasets/attack_cmu.json'
         else:
             self.password_keys = None
 
@@ -231,60 +231,8 @@ class Parameters():
             self.swipe_gravity_features = True
         else:
             assert 'False', 'swipe features have to be 0,1,2'
-        self.skip_fing_area = args.skip_fing_area
-        self.swipes_test_size = args.swipes_test_size
 
-        self.swipes_num_users = args.swipes_num_users
-  
-        self.verbose = args.verbose
-
-        self.eer_threshold = args.eer_threshold
-        self.mean_threshold = args.mean_threshold
-        self.median_threshold = args.median_threshold
-        self.median_classifiers = args.median_classifiers
-        
-        self.digraph_attack = args.digraph_attack
-        self.digraph_attack_type = args.digraph_attack_type
-        self.prob_then_kmeans = args.prob_then_kmeans
-        self.prob_kmeans_sample_size = args.prob_kmeans_sample_size
-        self.gaussian_components = args.gaussian_components
-
-        self.vgan = args.vgan
-        self.wgan = args.wgan
-        self.aegan = args.aegan
-        self.prob_attack = args.prob_attack
-        self.attack_clusters = args.attack_clusters
-        self.attack_num_tries = args.attack_num_tries
-        self.exclude_trained_samples = args.exclude_trained_samples
-
-        self.manhattan = args.manhattan
-        self.scaled_manhattan = args.scaled_manhattan
-        self.svm = args.svm
-        self.ae = args.ae
-        self.var_ae = args.var_ae
-        self.con_ae = args.con_ae
-        self.random_forests = args.random_forests
-        self.rf_trees = args.rf_trees
-        self.pohmm = args.pohmm
-        self.gaussian = args.gaussian
-        self.knc = args.knc
-        self.knc_neighbors = args.knc_n
-        self.nearest_neighbors = args.nearest_neighbors
-        self.gaussian_mixture = args.gaussian_mixture 
-        self.ensemble = args.ensemble
-        self.dbn = args.dbn
-        self.deng = args.deng
-        self.fc_net = args.fc_net
-
-        self.shuffle_training_data = args.shuffle_training_data
-
-        # self.impostor_samples = args.impostor_samples
-
-        self.skip_inputs = args.skip_inputs
-
-        self.skip_features = []  # Only for keystrokes
-        self.add_features = False  
-        
+        self.add_features = False
         if args.feature_norm == '0' or args.feature_norm == 'None':
             self.feature_norm = None
         elif args.feature_norm == 'stddev' or args.feature_norm == 'minmax':
@@ -298,38 +246,11 @@ class Parameters():
         else:
             self.score_norm = args.score_norm
 
-        self.seed = args.seed
-
-        self.kmeans_attack = args.kmeans_attack
-        self.gan_attack = args.gan_attack
-
-        self.cracker = args.cracker
-
-        self.kmeans_cluster_size = args.kmeans_cluster_size
-        self.kmeans_impostors = args.kmeans_impostors
-        self.kmeans_impostor_samples = args.kmeans_impostor_samples
-
-        self.robustness_check = args.robustness_check
-
-        self.sanity_genuine_results = []     # global arrays for stats
-        self.sanity_impostor_results = []
-
-        self.complete_check = args.complete_check
-
-        self.attack_bad_users = args.attack_bad_users
-        self.attack_ok_users = args.attack_ok_users
-        self.attack_great_users = args.attack_great_users
-
-        self.quick_test = args.quick_test
-        self.quick_test_num = args.quick_test_num
-        self.extract_attack_vectors = args.extract_attack_vectors
-
         self.num_features = 31
         self.skip_users = []
-        
         # Will add all the string rep of classifiers after training to this
         # list so we can pass them around.
         self.classifiers_list = []
-
-        self.induced_eer = args.induced_eer
-
+        self.sanity_genuine_results = []     # global arrays for stats
+        self.sanity_impostor_results = []
+        self.skip_features = []  # Only for keystrokes

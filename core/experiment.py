@@ -34,7 +34,6 @@ except ImportError:
     pass
 
 def plot_distribution(samples, file_name):
-    print('num of samples are ', len(samples)) 
     main_fig = plt.figure()
     ax1 = main_fig.add_subplot(131)
     fig = sns.distplot(samples, kde=False, ax=ax1)
@@ -43,11 +42,11 @@ def plot_distribution(samples, file_name):
     # sns.plt.show()
     fig.get_figure().savefig(file_name)
     print('saved file ', file_name)
-    sns.plt.close() 
+    sns.plt.close()
 
 def isclose(a, b, rel_tol=1e-09, abs_tol=0.0):
         return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
- 
+
 class Experiment():
     '''
     The overarching class that keeps all information about the current
@@ -67,15 +66,15 @@ class Experiment():
         self.loader = Loader(self)
         self.stats = Stats(self.params)
         self.data = self.loader.load_data()
-        
+
         # list of hashes of each of the used samples
         self.used_samples = []
         self.attack_data = defaultdict(list)
-        
+
         # used for serwadda attack.
         # TODO: Turn this into a loop and check all arguments.
         if 'cmu' in self.params.dataset or 'mturk' in self.params.dataset:
-            self.unique_features_data = self._get_unique_data() 
+            self.unique_features_data = self._get_unique_data()
             a = self.data['0'][0][0]
             b = self.data['0'][0][1]
             c = self.data['0'][0][2]
@@ -86,7 +85,7 @@ class Experiment():
 
         # Now that we have the data object, we can proceed to the actual
         # experiment
-    
+
     def _gen_distribution_file_name(self, samples, key_num=None):
         '''
         Creates file name based on current dataset.
@@ -100,22 +99,22 @@ class Experiment():
                 key_type = 'DD'
             elif key_num % 3 == 0:
                 key_type = 'HOLD'
-            elif key_num % 3 == 0: 
+            elif key_num % 3 == 0:
                 key_type = 'UD'
             else:
                 key_type = ''
         else:
             key_type = ''
- 
-        name += key_type + '_' + str(key_num) + '.png' 
+
+        name += key_type + '_' + str(key_num) + '.png'
         return name
-           
+
     def probability_analysis(self):
         '''
         fits distributions? Didn't work too well.
         Make graphs of distributions - like digraph distributions etc.
         '''
-        data = self._get_gan_data() 
+        data = self._get_gan_data()
         for k, samples in data.iteritems():
             file_name = self._gen_distribution_file_name(samples, int(k))
             # Basically got too many outlier max values
@@ -125,22 +124,26 @@ class Experiment():
             print('min : ', m1)
             print('max : ', m2)
             print('mean: ', m3)
-            
+
             # if 'cmu' in self.params.dataset:
                 # samples = [s for s in samples if s < 0.5]
 
             # samples = random.sample(samples, 2000)
-            fig = plot_distribution(samples, file_name) 
+            fig = plot_distribution(samples, file_name)
             # n = norm.fit(test_data)
             # print('normal = ', n)
             loc, scale = norm.fit(samples)
             print('fitting normal to {}, we get loc: {}, scale: {}'.format(k, loc, scale))
             print('let us try to generate samples from this distribution: ')
-            gen_samples = np.random.normal(loc=loc, scale=scale, size=10) 
-            print(gen_samples) 
+            gen_samples = np.random.normal(loc=loc, scale=scale, size=10)
+            print(gen_samples)
 
     def cluster_analysis(self):
-        # from gap import gap 
+        '''
+        Various cluster analysis techniques to try and show that the hypothesis of users behaviours
+        being clusterable makes sense.
+        '''
+        # from gap import gap
         gap_stat = False
         tsne = False
         cluster_analysis = True
@@ -161,9 +164,9 @@ class Experiment():
         print "removed: ", removed
 
         if gap_stat:
-            X = np.array(X) 
-            print(X.shape) 
-            gaps, s_k, K = gap.gap_statistic(X, refs=None, B=10, K=range(3,15), N_init = 10) 
+            X = np.array(X)
+            print(X.shape)
+            gaps, s_k, K = gap.gap_statistic(X, refs=None, B=10, K=range(3,15), N_init = 10)
             print('gaps = ', gaps)
             print('sK = ', s_k)
             print('K = ', K)
@@ -171,11 +174,11 @@ class Experiment():
             print('bestKValue: ', bestKValue)
 
         if cluster_analysis:
-            # X = np.array(X) 
-            # kmeans = KMeans(n_clusters=16).fit(np.random.rand(X.shape[0], X.shape[1])) 
+            # X = np.array(X)
+            # kmeans = KMeans(n_clusters=16).fit(np.random.rand(X.shape[0], X.shape[1]))
             kmeans = KMeans(n_clusters=16).fit(X)
             print(len(kmeans.labels_))
-            
+
             new_clusters = defaultdict(int)
 
             final_clusters = defaultdict(int)
@@ -206,10 +209,10 @@ class Experiment():
                         bad_clusters += 1
 
                     new_clusters = defaultdict(int)
-                
+
                 new_clusters[c] += 1
 
-            
+
             entropies = np.array(entropies)/math.log(16)
             print('good clusters = ', good_clusters)
             print('bad clusters = ', bad_clusters)
@@ -224,15 +227,14 @@ class Experiment():
                 print "For i: ", i+1, "       distance: ", kmeans.inertia_
                 distances.append(kmeans.inertia_)
             print "Distances: ", distances
-            exit(0)
 
         if cohesion:
             # cohesion analysis:
             clusters = defaultdict(list)
-            kmeans = KMeans(n_clusters=16).fit(X) 
+            kmeans = KMeans(n_clusters=16).fit(X)
             for i, c in enumerate(kmeans.labels_):
                 clusters[c].append(X[i])
-            
+
             print(len(clusters))
             for k, c in clusters.iteritems():
                 print('k = ', k)
@@ -242,22 +244,22 @@ class Experiment():
                 # print(row_sum[0])
                 row_mean /= float(len(clusters[k]))
                 # print(len(clusters[k]))
-                # print(row_sum[0]) 
+                # print(row_sum[0])
                 sum = 0
                 for feature in c:
                     sum += np.sum(np.square(row_mean - feature))
                 print(sum)
-        
+
         if silhouette:
             # for n_clusters in [2,4,6,8,10,12,14,16]:
             n_clusters = 16
             X = np.array(X)
             # X = np.random.rand(X.shape[0], X.shape[1])
-            cluster_labels = KMeans(n_clusters=n_clusters).fit_predict(X) 
+            cluster_labels = KMeans(n_clusters=n_clusters).fit_predict(X)
             silhouette_avg = silhouette_score(X, cluster_labels)
             print("For n_clusters =", n_clusters,
                   "The average silhouette_score is :", silhouette_avg)
-        
+
 
         print('succesfully finished cluster analysis!')
 
@@ -268,12 +270,12 @@ class Experiment():
         (0,3,6 etc) guys in each feature vector.
         '''
         extracted_features = []
-        for _, feature_vectors in self.data.iteritems(): 
+        for _, feature_vectors in self.data.iteritems():
             for feature_vector in feature_vectors:
                 for i, feature in enumerate(feature_vector):
                     if i % 3 in feature_num:
                         extracted_features.append(feature)
-        
+
         print(len(extracted_features))
         # assert len(extracted_features) == 51 * 400 * 11, 'len does not match'
         return extracted_features
@@ -281,7 +283,7 @@ class Experiment():
     def _get_gan_data(self, exclude=[], num=None):
         '''
         Get the hold data in the format needed for the gan adversary.
-        
+
         TODO: Exclude a particular user from this data collection process etc.
 
         @ret: dict.
@@ -308,7 +310,7 @@ class Experiment():
                         # This is because for swipes etc there is no unique
                         # thing.
                         gan_data[str(i)].append(feature)
-        
+
         if num is not None:
             # Reduce the number of samples per data point.
             smaller_gan_data = defaultdict(list)
@@ -318,11 +320,11 @@ class Experiment():
                 if num > len(gan_data[k]):
                     num = len(gan_data[k])
                 smaller_gan_data[k] = random.sample(gan_data[k], num)
-        else: 
-            smaller_gan_data = gan_data 
+        else:
+            smaller_gan_data = gan_data
 
         return smaller_gan_data
-    
+
     def _get_unique_data(self):
         '''
         '''
@@ -335,14 +337,14 @@ class Experiment():
                     if not i % 3 == 1:
                         unique_features.append(feature)
                 unique_features_user[user].append(unique_features)
-            unique_features_user[user] = np.array(unique_features_user[user]) 
+            unique_features_user[user] = np.array(unique_features_user[user])
         return unique_features_user
 
     def _get_digraph_data(self,feature_num=[0,1], num_users=51):
         '''
         '''
         unique_features_user = []
-        labels = [] 
+        labels = []
         cur_user = 0
         for user, feature_vectors in self.data.iteritems():
             cur_user += 1
@@ -357,12 +359,12 @@ class Experiment():
                 unique_features_user.append(unique_features)
                 labels.append(user)
 
-            # unique_features_user[user] = np.array(unique_features_user[user]) 
-        
+            # unique_features_user[user] = np.array(unique_features_user[user])
+
         print('unique feature users len: ', len(unique_features_user))
         # print(len(unique_features_user[0]))
         return np.array(unique_features_user), np.array(labels)
-    
+
     def _exclude_samples(self):
         '''
         '''
@@ -372,7 +374,7 @@ class Experiment():
                 if hashlib.sha1(str(sample)).hexdigest() in self.used_samples:
                     continue
                 new_data[u].append(sample)
-        
+
         # TODO: Do this nicer.
         for k in new_data:
             new_data[k] = np.array(new_data[k])
@@ -382,49 +384,49 @@ class Experiment():
     def start(self):
         '''
         What used to be the main starting function.
-        ''' 
-        # run statistics on the data. 
-        users = self._train_users(self.data)  
+        '''
+        # run statistics on the data.
+        users = self._train_users(self.data)
         # get rid of doubles
         if not self.params.mouse:
             self.used_samples = set(self.used_samples)
 
-        self.stats.mean_eer = self._get_mean_eer(users) 
+        self.stats.mean_eer = self._get_mean_eer(users)
         # print('len of samples to exclude are: ', len(self.used_samples))
         self.attack_data = self._exclude_samples()
 
-        print('eer for classifiers are ', self.stats.mean_eer) 
+        print('eer for classifiers are ', self.stats.mean_eer)
         # add flag.
         # self._great_ok_bad(users)
 
         if self.params.robustness_check:
             assert False, 'Need to fix robustness check'
             self._test_classifier(users, data)
-        
+
         # Time for attacks
         attacker = Adversary(self.attack_data, self)
 
-        if self.params.cracker: 
+        if self.params.cracker:
             # Should have this in main.py itself?
             attacker.cracker_combo(users)
-        
-        if self.params.kmeans_attack: 
+
+        if self.params.kmeans_attack:
             # Note: This seems a bit weird because we want to pass the
             # classifier num to kmeans_attack
             for c in range(len(users[0].classifiers)):
                 self._kmeans_attack(users, attacker, classifier=c)
-        
+
         if False:
             for band in [0.0001, 0.001, 0.002, 0.003, 0.004, 0.005]:
                 print('bandwidth is ', band)
                 prob_adv=KernelDensityAdversary(self.params.dataset, band)
-                gan_data = self._get_gan_data() 
+                gan_data = self._get_gan_data()
                 prob_adv.add_data(gan_data)
-                prob_adv.train() 
-                self._gan_attack(users, prob_adv)  
+                prob_adv.train()
+                self._gan_attack(users, prob_adv)
 
         if self.params.digraph_attack:
- 
+
             num_hacked = 0
             # Need to only train this once because there is no overlap with the
             # user data!
@@ -436,7 +438,7 @@ class Experiment():
                     attack_alg=self.params.digraph_attack_type,
                     components=self.params.gaussian_components)
             attacker.add_data(attack_prob_data)
-            attacker.train() 
+            attacker.train()
 
             if self.params.password_keys is None:
                 assert False, 'should not be doing digraph attack'
@@ -450,19 +452,19 @@ class Experiment():
                     sample = np.array(sample)
                     if self.params.keystrokes:
                         samples[i] = self._add_dependent_features(sample)
-                
+
                 # Want to do this for every classifier.
-                
+
                 for cl_name in self.params.classifiers_list:
-                    print('cl_name: ', cl_name) 
+                    print('cl_name: ', cl_name)
                     # single cracker is enough to run on all the users one by one.
                     tmp_data = {}
-                    tmp_data['attacker'] = np.array(samples)  
+                    tmp_data['attacker'] = np.array(samples)
                     cracker = Cracker(dict(tmp_data), self.unique_features_data,
                                 self.params.dataset, num_users=len(self.data))
                     for user in users:
                         num_hacked += self._prob_kmeans_attack(user, attacker,
-                                    cracker, cl_name) 
+                                    cracker, cl_name)
 
                     print('num hacked users = ', num_hacked)
                     print('num secure users = ', len(users) - num_hacked)
@@ -470,16 +472,16 @@ class Experiment():
                     self.stats.cracker['prob_kmeans_attack' + cl_name] = cracker
             else:
                 self._gan_attack(users, attacker, password_keys=self.params.password_keys)
-                
+
         if self.params.prob_attack:
 
             if self.params.android:
                 prob_adv=SwipesProbabilisticAdversary(self.params.dataset, clusters=self.params.attack_clusters)
-                gan_data = self._get_gan_data() 
+                gan_data = self._get_gan_data()
                 prob_adv.add_data(gan_data)
-                prob_adv.train() 
+                prob_adv.train()
                 self._gan_attack(users, prob_adv)
-            
+
             if self.params.keystrokes:
                 num_hacked = 0
                 exclude = []
@@ -490,15 +492,15 @@ class Experiment():
                     prob_adv=ProbabilisticAdversary(self.params.dataset,
                             clusters=self.params.attack_clusters,
                             components=self.params.gaussian_components)
-                    gan_data =self._get_gan_data(exclude=[user.y]+exclude,num=None) 
+                    gan_data =self._get_gan_data(exclude=[user.y]+exclude,num=None)
                     prob_adv.add_data(gan_data)
-                    prob_adv.train() 
+                    prob_adv.train()
                     # num_hacked += self._prob_kmeans_attack(user, prob_adv)
 
                     # actually returns num hacked users - but can treat it as +ve
                     # or -ve here
                     num_hacked += self._gan_attack([user], prob_adv)
-     
+
                 print('num hacked users = ', num_hacked)
                 print('num secure users = ', len(users) - num_hacked)
                 print('percentage of hacked users = ',float(num_hacked)/len(users))
@@ -507,43 +509,43 @@ class Experiment():
             if self.params.vgan:
                 gan_adv = GANAdversary('test', 'test', clusters=2,
                         num_epochs=5000)
-                gan_data = self._get_gan_data() 
+                gan_data = self._get_gan_data()
                 gan_adv.add_data(gan_data)
-                gan_adv.train_gans() 
+                gan_adv.train_gans()
                 self._gan_attack(users, gan_adv)
             if self.params.wgan:
                 gan_adv = WGANAdversary()
-                gan_data = self._get_gan_data(num=None) 
+                gan_data = self._get_gan_data(num=None)
                 gan_adv.add_data(gan_data)
-                gan_adv.train_gans() 
+                gan_adv.train_gans()
                 self._gan_attack(users, gan_adv)
             if self.params.aegan:
                 gan_adv = AdversarialAE()
-                gan_data = self._get_gan_data(num=None) 
+                gan_data = self._get_gan_data(num=None)
                 gan_adv.add_data(gan_data)
-                gan_adv.train_gans() 
+                gan_adv.train_gans()
                 self._gan_attack(users, gan_adv)
-           
+
     def get_classifiers_list(self):
         '''
         Useful for stats.export_cracker etc
         '''
         pass
-    
+
     def _prob_kmeans_attack(self, user, attacker, cracker, cl_name=None):
         '''
         @cracker: pass in a cracker if you are willing to use them on all the
         users (for instance if the attack data comes from a completely
         different sample set). If it is None, then will retrain it based on
         samples generated by attacker.
-        '''  
-        # yi = user.y 
+        '''
+        # yi = user.y
         if cl_name is None:
             print('cl name was none!!')
             exit(0)
 
-        broke = cracker.crack(user, cl_name, n_samples=100000) 
-        
+        broke = cracker.crack(user, cl_name, n_samples=100000)
+
         if broke:
             return 1
         else:
@@ -554,7 +556,7 @@ class Experiment():
         TODO: Need to fix this so we print stats about % users broken after n
         tries.
         '''
-        classifier_names = [] 
+        classifier_names = []
         if self.params.ensemble:
             classifier_names.append('ensemble')
         else:
@@ -562,7 +564,7 @@ class Experiment():
                 for cl_name in u.classifiers:
                     classifier_names.append(cl_name)
                 break
-        
+
         if password_keys is None:
             password_keys = []
             for i in range(len(self.data['0'][0])):
@@ -572,7 +574,7 @@ class Experiment():
                     # swipe data
                     password_keys.append(str(i))
 
-        hacked_users = 0 
+        hacked_users = 0
         secure_users = 0
 
         num_hack_tries = []
@@ -598,7 +600,7 @@ class Experiment():
                         result = user.test(sample, cl_name)
                         if result[0] > 0:
                             broken = True
-                        i += 1        
+                        i += 1
 
                 if broken:
                     # print('broke user {} in tries {}'.format(yi, i))
@@ -607,7 +609,7 @@ class Experiment():
                 else:
                     # print('could not break user {}'.format(yi))
                     secure_users += 1
-        
+
         if self.params.verbose:
             print('num hacked users are ', hacked_users)
             print('num secure users are ', secure_users)
@@ -631,16 +633,16 @@ class Experiment():
         total_len = len(result) / 2 + len(result)
         features = [None]*total_len
         for i, r in enumerate(result):
-            keystroke = i / 2 
+            keystroke = i / 2
             feature = i % 2     # 0 or 1
             # index in features vector: keystroke*3 + feature
             index = keystroke * 3 + feature
-            if feature == 1:  
+            if feature == 1:
                 features[index] = result[i] + result[i-1]
                 features[index+1] = r
-            else: 
+            else:
                 features[index] = r
-        
+
         self._sanity_check_cmu_features([features])
         return features
 
@@ -662,24 +664,24 @@ class Experiment():
 
         Wrapper method for kmeans attack. We take in a list of users we want to
         attack, a list of users whose data we want to use - defaulting to the whole
-        dictionary, data, 
+        dictionary, data,
         expert_level only used for swipes data...
         '''
         if len(users) == 0:
             return
-        
+
         start = time.time()
         kmeans_attack = {}
-        
+
         total_fails = 0
-        
+
         for user in users:
             yi = user.y
             # Each centroid can essentially be viewed as a feature vector.
             centroids = attacker.kmeans_attack(yi,clusters=self.params.kmeans_cluster_size,
                                         num_impostors=self.params.kmeans_impostors,
                                         num_impostor_samples=self.params.kmeans_impostor_samples)
-        
+
             kmeans_attack[yi] = []
 
             failed_to_break = True
@@ -707,7 +709,7 @@ class Experiment():
                     print 'failed to break user ', yi
                 else:
                     print 'break user ', yi
-        
+
         if self.params.verbose:
             total_tries = self.params.kmeans_cluster_size*len(users)
             print 'fails / tries = ', float(total_fails) / total_tries
@@ -726,7 +728,7 @@ class Experiment():
                     hacked = False
                 if self.params.verbose:
                     print score
-        
+
         end = time.time()
         if self.params.verbose:
             print('number of users which we failed to break were ',len(best_users))
@@ -735,7 +737,7 @@ class Experiment():
     def _get_mean_eer(self, users):
         '''
         ret: dict, key:classifier, val: mean eer
-        ''' 
+        '''
         if (len(users) == 0):
             return 0
 
@@ -746,7 +748,7 @@ class Experiment():
                 # Edge case in far_classifiers...
                 if 'median' in name:
                     continue
-                ret[name] += float(u.eers[name]) 
+                ret[name] += float(u.eers[name])
 
         for name in ret:
             ret[name] = float(ret[name]) / len(users)
@@ -772,26 +774,26 @@ class Experiment():
             if eer > 0.10:
                 bad_eer += 1
                 bad_users.append(user)
-            
+
             # Anything less than 1 percent is perfect!
             if (eer) < great_threshold:
                 great_eer += 1
                 great_users.append(user)
-            
+
             # Between 1 and 10 %, life's meh.
             if eer < 0.10 and eer > great_threshold:
                 ok_eer += 1
                 ok_users.append(user)
-         
+
         # Now we can run our run on the mill attacks on only a subset of the users.
         # Question to decide - for the adversary, do we just throw all possible
         # data at it, or just from bad buckets - could be interesting to see if bad
         # users data also results in successful breakins.
-        
+
         # print 'mean of great users is ', get_mean_eer(great_users)
         # print 'mean of ok users is ', get_mean_eer(ok_users)
         # print 'mean of bad users is ', get_mean_eer(bad_users)
-        
+
         print('great users ---------------')
         print('num = ', len(great_users))
         self._analyze_features(great_users)
@@ -830,7 +832,7 @@ class Experiment():
         '''
         '''
         self.stats.print_params()
-    
+
     def _get_mouse_impostors(self, data, yi, num_per_user=5):
         '''
         TODO: Decide what format to use here.
@@ -840,7 +842,7 @@ class Experiment():
         for user, mouse_features in data.iteritems():
             if user == yi:
                 continue
-            for i, task in enumerate(mouse_features.tasks):   
+            for i, task in enumerate(mouse_features.tasks):
                 if i >= num_per_user:
                     break
                 impostors.append(task)
@@ -850,13 +852,13 @@ class Experiment():
     def _train_users(self, data):
         '''
         @ret: users list - with user object for each trained user.
-        '''        
+        '''
         data_hash1 = hashlib.md5(pickle.dumps(data)).hexdigest()
         users = []
         start_time = time.time()
-       
+
         np.random.seed(self.params.seed)
-        
+
         if self.params.verbose:
             print('total num users are ', len(data))
 
@@ -866,11 +868,11 @@ class Experiment():
                 break
 
             # All reps of this user. Each element in Xi represents the features of
-            # the typed password. 
+            # the typed password.
             if yi in self.params.skip_users:
                 print 'skipped user ', yi
                 continue
-            
+
             # So we can separate out the mouse training process.
             if self.params.keystrokes or self.params.android:
                 '''
@@ -878,14 +880,14 @@ class Experiment():
                 Basically deals with the point till we create a user, including
                 a lot of ugly stuff.
                 '''
-                train_samples = data[yi]          
+                train_samples = data[yi]
                 if len(train_samples) < 50:
                     print('skipping user {} because too few samples'.format(yi))
                     continue
 
                 self._sanity_check(train_samples)
-                
-                if self.params.android: 
+
+                if self.params.android:
                     # impostors = self._get_first_impostors(data, yi)
                     impostors = self._get_impostors(data, yi,
                             num=len(train_samples),
@@ -896,7 +898,7 @@ class Experiment():
                     # Not using train impostors so far...
                     train_impostors = self._get_impostors(data,
                             yi,num=100,samples_per_user=5,seed=2468)
-                    
+
                     # Also, I'm not using get_first_impostors here, because then we
                     # will at least have 600 (or more) impostor samples, as opposed to
                     # just 50 genuine samples...
@@ -913,17 +915,17 @@ class Experiment():
                     if self.params.induced_eer:
                         impostors = self._get_kmeans_impostors(data, yi,
                                 num=len(train_samples)/2)
-                
+
                 self._sanity_check(impostors)
 
                 user = User(yi, np.copy(train_samples), np.copy(impostors),
                         np.copy(train_impostors), self)
-            
+
             elif self.params.mouse:
                 if len(data[yi].tasks) < 10:
                     continue
                 impostors = self._get_mouse_impostors(data, yi, num_per_user=25)
-                user = MouseUser(yi, data[yi], impostors, self) 
+                user = MouseUser(yi, data[yi], impostors, self)
 
             else:
                 assert False, 'not supported experiment kind'
@@ -933,23 +935,23 @@ class Experiment():
 
             if self.params.ae:
                 user.train(lambda: Autoencoder([5, 4, 3]), name='Autoencoder')
-            
+
             if self.params.var_ae:
                 user.train(lambda: VariationalAutoencoder(dict(n_hidden_recog_1=5,
-                                                    n_hidden_recog_2=5,  
-                                                    n_hidden_gener_1=5,  
-                                                    n_hidden_gener_2=5, 
-                                                    n_z=3), 
+                                                    n_hidden_recog_2=5,
+                                                    n_hidden_gener_1=5,
+                                                    n_hidden_gener_2=5,
+                                                    n_z=3),
                                                batch_size=2),
                                                name='VariationalAutoencoder')
-            
+
             if self.params.con_ae:
                 start_ac = time.time()
                 user.train(lambda: ContractiveAutoencoder(400, lam=1.5),
                 name='ContractiveAutoencoder')
                 end_ac = time.time()
-            
-            if self.params.manhattan: 
+
+            if self.params.manhattan:
                 user.train(lambda: Manhattan(), name='Manhattan')
 
             if self.params.random_forests:
@@ -957,8 +959,8 @@ class Experiment():
                         two_class=True, name='RandomForests')
 
             if self.params.knc:
-                user.train(lambda: KNC(n_neighbors=self.params.knc_neighbors), 
-                        two_class = True, 
+                user.train(lambda: KNC(n_neighbors=self.params.knc_neighbors),
+                        two_class = True,
                         name='KNC')
 
             if self.params.fc_net:
@@ -967,10 +969,10 @@ class Experiment():
 
             if self.params.gaussian:
                 user.train(lambda: Gaussian(), name='Gaussian')
-            
+
             if self.params.nearest_neighbors:
                 user.train(lambda: NN(), name='NearestNeighbors')
-            
+
             #TODO: this still doesn't work because of the way fit works right
             # now.
             if self.params.pohmm:
@@ -982,14 +984,14 @@ class Experiment():
                                                 thresh=1e-2))
             if self.params.gaussian_mixture:
                 user.train(lambda: GM(), name='Gaussian Mixture')
-            
-            users.append(user)             
+
+            users.append(user)
             # This doesn't seem particularly useful. Maybe get stats later, but
             # people did generally well...can just use EER stats instead.
             # Full on test on every random guy we got:
             if self.params.complete_check:
                 self._complete_check(data, yi, user)
-        
+
         data_hash2 = hashlib.md5(pickle.dumps(data)).hexdigest()
         assert data_hash1 == data_hash2, 'data hashes diff!'
         end_time = time.time()
@@ -1018,7 +1020,7 @@ class Experiment():
         Selecting impostors based on the Antal et al. paper.
         '''
         pass
-    
+
     def _get_kmeans_impostors(self, data, user, num=200):
         '''
         '''
@@ -1027,11 +1029,11 @@ class Experiment():
         for d in data:
             # skip current user obviously.
             if d == user:
-                continue 
+                continue
             for x in data[d]:
-                X.append(x) 
+                X.append(x)
         X = np.array(X)
-        kmeans = KMeans(n_clusters=num).fit(X) 
+        kmeans = KMeans(n_clusters=num).fit(X)
         clusters = kmeans.cluster_centers_
         return clusters
 
@@ -1048,10 +1050,10 @@ class Experiment():
         '''
         if seed is None:
             seed = self.params.seed
-        
+
         # if 'greyc' in self.params.dataset:
             # samples_per_user = num / 10
-        
+
         # This should ensure consistent results.
         random.seed(seed)
 
@@ -1067,11 +1069,11 @@ class Experiment():
             # users, then just break out.
             if (total >= num) or it >= total_users-1:
                 break
-            
+
             # FIXME: This won't work in cases where the users aren't labeled 0....N
             user = str(random.randrange(total_users))
             if user in used_users:
-                continue 
+                continue
 
             X = data[user]
             # Pick a random collection of (samples_per_user) examples from it.
@@ -1081,31 +1083,31 @@ class Experiment():
 
             for x in selected_x:
                 impostors.append(x)
-            
+
             used_users.append(user)
             total += samples_per_user
-            it += 1 
+            it += 1
 
         impostors = np.array(impostors)
-        
+
         if self.params.exclude_trained_samples:
             for impostor in impostors:
                 self.used_samples.append(hashlib.sha1(str(impostor)).hexdigest())
-        
+
         return impostors
 
     # FIXME: include these here?
     def _get_first_impostors(self, data, user, num_per_impostor=5, skip_first_features=0):
         '''
         First n samples from all other users.
-        
+
         user = current user. string.
 
         Note: Can basically replicate results from maxion et al etc with this - but
         with the more random get_impostors method, the results were slightly worse.
         '''
         ret_list = []
-        
+
         # FIXME: Get rid of special case conditions....just call this function
         # with different parameters...
         if 'greyc' in self.params.dataset:
@@ -1122,9 +1124,9 @@ class Experiment():
 
             if(cur_user == user):
                 continue
-            
+
             cur_features = data[cur_user]
-            
+
             # Select first 4 users.
             for i in range(num_per_impostor):
                 if i >= len(cur_features):
@@ -1139,7 +1141,7 @@ class Experiment():
         return ret_list
 
     def _complete_check(self, data, yi, user):
-        
+
         success_impostor = 0
         fail_impostor = 0
 
@@ -1159,17 +1161,17 @@ class Experiment():
         print 'complete impostor success percentage is ', impostor_percentage
 
 # Figure out what to do with this later - being called from one of the no
-# longer used attack methods. 
+# longer used attack methods.
 def robustness_check(Xi_new, impostors_new, user, classifier=-1):
     '''
-    
+
     @Xi and impostors are just features of these guys.
     @user: user object.
     @classifier: index of the classifier, -1 for all.
 
     Things we want:
-        1.  % of failures (both types)  
-        2.  want to separate it by class of users. 
+        1.  % of failures (both types)
+        2.  want to separate it by class of users.
         I guess (1) should be comparable to eer from our training phase.
     '''
     # next two loops are just a sanity check.
@@ -1179,7 +1181,7 @@ def robustness_check(Xi_new, impostors_new, user, classifier=-1):
 
     success_genuine = 0
     fail_genuine = 0
-    
+
     for x in Xi_new:
         scores = user.test(x, classifier)
         for score in scores:
@@ -1187,7 +1189,7 @@ def robustness_check(Xi_new, impostors_new, user, classifier=-1):
                 success_genuine += 1
             else:
                 fail_genuine += 1
-    
+
     for x in impostors_new:
         scores = user.test(x, classifier)
         for score in scores:
@@ -1195,11 +1197,11 @@ def robustness_check(Xi_new, impostors_new, user, classifier=-1):
                 success_impostor += 1
             else:
                 fail_impostor += 1
-    
+
     genuine_percentage = float(success_genuine)/(fail_genuine+success_genuine)
 
     impostor_percentage = float(success_impostor) / (fail_impostor+success_impostor)
-    
+
     # return the error rate.
     total = fail_genuine + success_genuine + fail_impostor + success_impostor
     error_rate = float(fail_genuine + success_impostor) / total

@@ -40,8 +40,8 @@ cd adversarial_keystrokes
 pip install -r requirements.txt
 ```
 
-Note: I have not configured matplotlib with virtualenv here. If you would like to [reproduce the
-graphs](#reproducing-figures), then you will need to either configure virtualenv with matplotplib,
+Note: I have not configured matplotlib with virtualenv here. If you would like to reproduce the
+graphs, then you will need to either configure virtualenv with matplotplib,
 as described [here](https://matplotlib.org/1.5.1/faq/virtualenv_faq.html), or don't use the
 virtualenv, and just install the pip dependencies system wide:
 
@@ -164,6 +164,8 @@ without making any changes to the keystrokes classifiers/adversaries.
 
 * Add the classifier as a class in core/anomaly.py in the same format as:
     * One Class Classifiers: Like class Manhattan, it will need a fit and a score method.
+    * Two Class Classifiers: The fit method will now accept impostor samples as well. See the
+    methods for class RandomForests.
 
 #### Adding New Adversary
 
@@ -205,10 +207,10 @@ This repository has consolidated work across multiple repositories by all the pa
 original hypothesis for the project was due to Dr. Bahman Bahmani, and the project was started by
 Vivek Jain, who among other things implemented the K-means++ and MasterKey adversaries.
 
-I initially began working on this project by playing around with Vinnie Monaco's excellent
-keystroke dynamics [classifiers](https://github.com/vmonaco/kboc), which inspired the overall
-design of this repository as well. There are also many crucial pieces of code used from Monaco's
-repository in our project, and I have tried to explicitly mention this at all such places.
+The overall design of the repository was inspired by the excellent keystroke dynamics
+[classifiers](https://github.com/vmonaco/kboc), and there are also many crucial pieces of code used
+from Monaco's repository in our project, and I have tried to explicitly mention this at all such
+places.
 
 
 ## Licence

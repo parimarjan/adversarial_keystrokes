@@ -24,10 +24,10 @@ class Stats():
         self.mean_eer = {}
         self.cracker = {}
 
-        # self.cracker_num_tries = [0, 9, 49, 99, 999]
-        self.cracker_num_tries = []
-        for i in range(100):
-            self.cracker_num_tries.append(i)
+        self.cracker_num_tries = [0, 9, 49, 99]
+        # self.cracker_num_tries = []
+        # for i in range(100):
+            # self.cracker_num_tries.append(i)
         
         name = params.dataset + '_cracker.csv'
         if params.digraph_attack:
