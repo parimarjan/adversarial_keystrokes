@@ -13,7 +13,7 @@ funcsigs==1.0.2
 idna==2.6
 imagesize==0.7.1
 Jinja2==2.10
-joblib==0.11
+joblib==1.2.0
 MarkupSafe==1.0
 mock==2.0.0
 numpy==1.14.0rc1
